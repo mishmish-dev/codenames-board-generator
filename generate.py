@@ -146,7 +146,7 @@ def generate_pdf(words: Iterable[str], count: Optional[int] = None, shuffle_word
     if shuffle_words:
         shuffle(words)
         
-    if count is not None:
+    if count:
         words = words[:(count * BOARD_WORD_COUNT)]
 
     for i in range(len(words) // BOARD_WORD_COUNT):
