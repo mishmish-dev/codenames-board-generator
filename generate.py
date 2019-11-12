@@ -1,6 +1,6 @@
 from io import BytesIO
 from random import shuffle
-from typing import Iterable, Iterator, Optional, Tuple
+from typing import Iterable, Iterator, List, Optional, Tuple
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.colors import black, HexColor
@@ -40,6 +40,18 @@ def initialize_resources(card_image_path: str, primary_font_path: str, secondary
 
     global _card_image
     _card_image = ImageReader(card_image_path)
+
+
+def split_words(words_raw: str) -> List[str]:
+    splitted = words_raw.replace(",", "\n").splitlines(keepends=False)
+
+    result = []
+    for line in splitted:
+        parts = line.split()
+        if parts:
+            result.append(" ".join(parts))
+
+    return result
 
 
 class BoardPdfBuilder:
