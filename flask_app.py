@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
-from flask import Flask, request, send_file
+from flask import Flask, Response, request
+from werkzeug.wsgi import FileWrapper
 
 from generate import generate_pdf, split_words, initialize_resources
 
@@ -12,6 +13,19 @@ SHUFFLE_CHECKBOX = "shuffle_checkbox"
 
 initialize_resources("card.png", "PTSansBold.ttf", "PTSansBoldItalic.ttf")
 app = Flask(__name__)
+
+
+def send_file(buffer, filename, mimetype):
+    file_wrapper = FileWrapper(buffer)
+    headers = {
+        "Content-Disposition": 'attachment; filename="{}"'.format(filename)
+    }
+
+    return Response(file_wrapper,
+        mimetype=mimetype,
+        direct_passthrough=True,
+        headers=headers
+    )
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -78,8 +92,7 @@ def generate_codenames_board():
             count = None
 
         buffer = generate_pdf(split_words(words_raw), count, request.form.get(SHUFFLE_CHECKBOX))
-        buffer.name = "generated_boards.pdf"
         
-        return send_file(buffer, mimetype="application/pdf")
+        return send_file(buffer, "generated_boards.pdf", "application/pdf")
 
 
