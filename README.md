@@ -8,4 +8,4 @@ Should work with Python `>=3.5`
 ```
 python3 cli.py --count 3 --shuffle -i wordlists/ru/original.txt -o sample.pdf
 ```
-+ Great! Output looks like this [`this`](https://github.com/cekc/codenames-board-generator/blob/master/sample.pdf)
++ Great! Output looks like this [this](https://github.com/cekc/codenames-board-generator/blob/master/sample.pdf)
