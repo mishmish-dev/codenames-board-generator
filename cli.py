@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from sys import stdin
 
-from generate import generate_pdf, split_words, initialize_resources, BOARD_WORD_COUNT
+from generate import generate_pdf, split_words, initialize_resources
 
 
 if __name__ == "__main__":
@@ -26,7 +26,7 @@ if __name__ == "__main__":
             words_raw = words_file.read()
 
     initialize_resources(args.card, args.primary_font, args.secondary_font)
-    generated_bytes = generate_pdf(split_words(words_raw), args.count, args.shuffle)
+    generated_bytes = generate_pdf(split_words(words_raw), args.count, args.shuffle).read()
 
     with open(args.output, "wb") as output_file:
         output_file.write(generated_bytes)

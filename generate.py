@@ -138,7 +138,7 @@ class BoardPdfBuilder:
         self.canvas.save()
 
 
-def generate_pdf(words: Iterable[str], count: Optional[int] = None, shuffle_words: bool = True) -> bytes:
+def generate_pdf(words: Iterable[str], count: Optional[int] = None, shuffle_words: bool = False) -> BytesIO:
     buffer = BytesIO()
     builder = BoardPdfBuilder(buffer)
 
@@ -155,4 +155,4 @@ def generate_pdf(words: Iterable[str], count: Optional[int] = None, shuffle_word
     builder.build()
 
     buffer.seek(0)
-    return buffer.read()
+    return buffer
