@@ -1,20 +1,7 @@
 from argparse import ArgumentParser
 from sys import stdin
-from typing import List
 
-from generate import generate_pdf, initialize_resources, BOARD_WORD_COUNT
-
-
-def split_words(words_raw: str) -> List[str]:
-    splitted = words_raw.replace(",", "\n").splitlines(keepends=False)
-
-    result = []
-    for line in splitted:
-        parts = line.split()
-        if parts:
-            result.append(" ".join(parts))
-
-    return result
+from generate import generate_pdf, split_words, initialize_resources, BOARD_WORD_COUNT
 
 
 if __name__ == "__main__":
