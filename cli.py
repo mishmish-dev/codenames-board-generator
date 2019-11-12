@@ -1,9 +1,8 @@
 from argparse import ArgumentParser
-from random import shuffle
 from sys import stdin
 from typing import List
 
-from generate import generate_pdf, register_fonts, BOARD_WORD_COUNT
+from generate import generate_pdf, initialize_resources, BOARD_WORD_COUNT
 
 
 def split_words(words_raw: str) -> List[str]:
@@ -39,16 +38,8 @@ if __name__ == "__main__":
         with open(args.input) as words_file:
             words_raw = words_file.read()
 
-    words = split_words(words_raw)
-
-    if args.shuffle:
-        shuffle(words)
-
-    if args.count is not None:
-        words = words[:(args.count * BOARD_WORD_COUNT)]
-
-    register_fonts(args.primary_font, args.secondary_font)
-    generated_bytes = generate_pdf(args.card, words)
+    initialize_resources(args.card, args.primary_font, args.secondary_font)
+    generated_bytes = generate_pdf(split_words(words_raw), args.count, args.shuffle)
 
     with open(args.output, "wb") as output_file:
         output_file.write(generated_bytes)

@@ -1,6 +1,6 @@
 from io import BytesIO
-from math import sin, cos, radians
-from typing import Iterable, Iterator, List, Tuple
+from random import shuffle
+from typing import Iterable, Iterator, Optional, Tuple
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.colors import black, HexColor
@@ -31,22 +31,19 @@ SECONDARY_TEXT_DEFAULT_SIZE = 6.5*mm
 SECONDARY_TEXT_COLOR = HexColor(0x877250)
 
 
-def register_fonts(primary_font_path: str, secondary_font_path: str) -> None:
+_card_image: Optional[ImageReader] = None
+
+
+def initialize_resources(card_image_path: str, primary_font_path: str, secondary_font_path: str) -> None:
     pdfmetrics.registerFont(TTFont(PRIMARY_FONT_NAME, primary_font_path))
     pdfmetrics.registerFont(TTFont(SECONDARY_FONT_NAME, secondary_font_path))
 
-
-def rotate_point(x, y, angle) -> Tuple[float, float]:
-    phi = radians(angle)
-    cos_phi = cos(phi)
-    sin_phi = sin(phi)
-
-    return x * cos_phi - y * sin_phi, x * sin_phi + y * cos_phi
+    global _card_image
+    _card_image = ImageReader(card_image_path)
 
 
 class BoardPdfBuilder:
-    def __init__(self, card_image_path: str, output_file) -> None:
-        self.card_image = ImageReader(card_image_path)
+    def __init__(self, output_file) -> None:
         self.canvas = Canvas(output_file, pagesize=A4)
 
 
@@ -103,7 +100,7 @@ class BoardPdfBuilder:
 
         y = PAGE_HEIGHT - CARD_HEIGHT - row * CARD_VERTICAL_OFFSET - TOP_MARGIN
 
-        self.canvas.drawImage(self.card_image, x, y, CARD_WIDTH, CARD_HEIGHT)
+        self.canvas.drawImage(_card_image, x, y, CARD_WIDTH, CARD_HEIGHT)
 
         self.draw_primary_text(x + CARD_WIDTH / 2, y + 11.8*mm, word)
         self.draw_secondary_text(x + 26.5*mm, y + 22.7*mm, word)
@@ -129,9 +126,16 @@ class BoardPdfBuilder:
         self.canvas.save()
 
 
-def generate_pdf(card_image_path: str, words: List[str]) -> bytes:
+def generate_pdf(words: Iterable[str], count: Optional[int] = None, shuffle_words: bool = True) -> bytes:
     buffer = BytesIO()
-    builder = BoardPdfBuilder(card_image_path, buffer)
+    builder = BoardPdfBuilder(buffer)
+
+    words = list(words)
+    if shuffle_words:
+        shuffle(words)
+        
+    if count is not None:
+        words = words[:(count * BOARD_WORD_COUNT)]
 
     for i in range(len(words) // BOARD_WORD_COUNT):
         builder.add_board(words[(i * BOARD_WORD_COUNT):((i + 1) * BOARD_WORD_COUNT)])
