@@ -1,5 +1,7 @@
 # Usage
 
+Should work with Python `>=3.5`
+
 + Clone this repo
 + Install requirements with pip: `sudo python3 -m pip install -r requirements.txt` (or make a venv)
 + Run the script [`cli.py`](https://github.com/cekc/codenames-board-generator/blob/master/cli.py), for example
