@@ -13,6 +13,7 @@ SHUFFLE_CHECKBOX = "shuffle_checkbox"
 
 initialize_resources("card.png", "PTSansBold.ttf", "PTSansBoldItalic.ttf")
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 512 * 1024
 
 
 def send_file(buffer, filename, mimetype):
