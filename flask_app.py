@@ -45,7 +45,7 @@ def generate_codenames_board():
                     <br>
                     Перемешать слова в списке:<input type=checkbox name={shuffle}>
                     <br>
-                    Сделать не больше N штук (0=неограниченно): <input type=number min=0 max=200 value=0 name={count}>
+                    Сделать не больше N полей (0=неограниченно): <input type=number min=0 max=200 value=0 name={count}>
                     <br>
                     <input type=submit value=Сгенерировать!>
                 </fieldset>
@@ -60,7 +60,7 @@ def generate_codenames_board():
                     <br>
                     Перемешать слова в списке:<input type=checkbox name={shuffle}>
                     <br>
-                    Сделать не больше N штук (0=неограниченно): <input type=number min=0 max=200 value=0 name={count}>
+                    Сделать не больше N полей (0=неограниченно): <input type=number min=0 max=200 value=0 name={count}>
                     <br>
                     <input type=submit value=Сгенерировать!>
                 </fieldset>
