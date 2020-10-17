@@ -3,12 +3,10 @@ from http import HTTPStatus
 from flask import Flask, Response, request
 from werkzeug.wsgi import FileWrapper
 
-from generate import generate_pdf, split_words, initialize_resources
-
-
-WORDS_INPUT = "words_input"
-COUNT_INPUT = "count_input"
-SHUFFLE_CHECKBOX = "shuffle_checkbox"
+from generate import generate_pdf, initialize_resources
+from words import load_wordlists, split_words
+from html_page import WORDS_FILE_INPUT, WORDS_TEXT_INPUT, WORDLIST_INPUT, SHUFFLE_CHECKBOX, COUNT_INPUT
+from html_page import WORDLISTS, index_page
 
 
 initialize_resources("card.png", "PTSansBold.ttf", "PTSansBoldItalic.ttf")
@@ -32,57 +30,31 @@ def send_file(buffer, filename, mimetype):
 @app.route("/", methods=["GET", "POST"])
 def generate_codenames_board():
     if request.method == "GET":
-        return """
-            <!doctype html>
-            <title>Генератор полей для Коднеймс</title>
+        return index_page
 
-            <p><b>Слова разделяются запятыми и/или переводами строк.<br>
-            Слова <i>могут</i> содержать пробелы (лишние мы обрежем).</b></p>
-
-            <form method=post enctype=multipart/form-data>
-                <fieldset>
-                    <legend>Для слов из файла (должен быть в UTF-8):</legend>
-                    <input type=file name={words}>
-                    <br>
-                    Перемешать слова в списке:<input type=checkbox name={shuffle}>
-                    <br>
-                    Сделать не больше N полей (0=неограниченно): <input type=number min=0 max=200 value=0 name={count}>
-                    <br>
-                    <input type=submit value=Сгенерировать!>
-                </fieldset>
-            </form>
-
-            <br>
-
-            <form method=post enctype=multipart/form-data>
-                <fieldset>
-                    <legend>Для слов из текстовой формы:</legend>
-                    <textarea name={words} rows=8 style="width:400px"></textarea>
-                    <br>
-                    Перемешать слова в списке:<input type=checkbox name={shuffle}>
-                    <br>
-                    Сделать не больше N полей (0=неограниченно): <input type=number min=0 max=200 value=0 name={count}>
-                    <br>
-                    <input type=submit value=Сгенерировать!>
-                </fieldset>
-            </form>
-
-        """.format(words=WORDS_INPUT, shuffle=SHUFFLE_CHECKBOX, count=COUNT_INPUT)
-
-    else:
-        if WORDS_INPUT in request.files:
-            words_file = request.files[WORDS_INPUT]
+    elif request.method == "POST":
+        if WORDS_FILE_INPUT in request.files:
+            words_file = request.files[WORDS_FILE_INPUT]
 
             try:
-                words_raw = words_file.read().decode("utf-8")
+                words = split_words(words_file.read().decode("utf-8"))
             except:
                 return (
                     "Не удалось прочесть файл. Убедитесь, что он в UTF-8.",
                     HTTPStatus.UNPROCESSABLE_ENTITY
                 )
 
-        elif WORDS_INPUT in request.form:
-            words_raw = request.form[WORDS_INPUT]
+        elif WORDS_TEXT_INPUT in request.form:
+            words = split_words(request.form[WORDS_TEXT_INPUT])
+
+        elif WORDLIST_INPUT in request.form:
+            try:
+                words = WORDLISTS[int(request.form[WORDLIST_INPUT])].wordlist
+            except:
+                return (
+                    "Что-то не так с выбором набора.",
+                    HTTPStatus.UNPROCESSABLE_ENTITY
+                )
 
         else:
             return "Request not recognized", HTTPStatus.NOT_FOUND
@@ -92,8 +64,12 @@ def generate_codenames_board():
         except:
             count = None
 
-        buffer = generate_pdf(split_words(words_raw), count, request.form.get(SHUFFLE_CHECKBOX))
-        
+        buffer = generate_pdf(words, count, request.form.get(SHUFFLE_CHECKBOX))
+
         return send_file(buffer, "generated_boards.pdf", "application/pdf")
 
-
+    else:
+        return (
+            "Unsupported method",
+            HTTPStatus.METHOD_NOT_ALLOWED
+        )

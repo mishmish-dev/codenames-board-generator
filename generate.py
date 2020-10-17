@@ -42,18 +42,6 @@ def initialize_resources(card_image_path: str, primary_font_path: str, secondary
     _card_image = ImageReader(card_image_path)
 
 
-def split_words(words_raw: str) -> List[str]:
-    splitted = words_raw.replace(",", "\n").splitlines(keepends=False)
-
-    result = []
-    for line in splitted:
-        parts = line.split()
-        if parts:
-            result.append(" ".join(parts))
-
-    return result
-
-
 class BoardPdfBuilder:
     def __init__(self, output_file) -> None:
         self.canvas = Canvas(output_file, pagesize=A4)
@@ -61,7 +49,7 @@ class BoardPdfBuilder:
 
     def draw_primary_text(self, x, y, text: str) -> None:
         textobj = self.canvas.beginText()
-        
+
         size = PRIMARY_TEXT_DEFAULT_SIZE
         width = self.canvas.stringWidth(text, PRIMARY_FONT_NAME, size)
         if width >= PRIMARY_TEXT_MAX_WIDTH:
@@ -71,7 +59,7 @@ class BoardPdfBuilder:
         textobj.setFont(PRIMARY_FONT_NAME, size)
 
         textobj.setTextOrigin(x - width / 2, y - 0.35 * size)
-        
+
         textobj.textOut(text)
 
         self.canvas.setFillColor(PRIMARY_TEXT_COLOR)
@@ -80,7 +68,7 @@ class BoardPdfBuilder:
 
     def draw_secondary_text(self, x, y, text: str) -> None:
         textobj = self.canvas.beginText()
-        
+
         size = SECONDARY_TEXT_DEFAULT_SIZE
         width = self.canvas.stringWidth(text, SECONDARY_FONT_NAME, size)
         if width >= SECONDARY_TEXT_MAX_WIDTH:
@@ -90,7 +78,7 @@ class BoardPdfBuilder:
         textobj.setFont(SECONDARY_FONT_NAME, size)
 
         textobj.setTextOrigin(-x - width / 2, -y - 0.7 * size)
-        
+
         textobj.textOut(text)
 
         self.canvas.saveState()
@@ -145,7 +133,7 @@ def generate_pdf(words: Iterable[str], count: Optional[int] = None, shuffle_word
     words = list(words)
     if shuffle_words:
         shuffle(words)
-        
+
     if count:
         words = words[:(count * BOARD_WORD_COUNT)]
 

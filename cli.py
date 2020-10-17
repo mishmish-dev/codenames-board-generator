@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
 from sys import stdin
 
-from generate import generate_pdf, split_words, initialize_resources
+from generate import generate_pdf, initialize_resources
+from words import split_words
 
 
 if __name__ == "__main__":
@@ -30,5 +31,3 @@ if __name__ == "__main__":
 
     with open(args.output, "wb") as output_file:
         output_file.write(generated_bytes)
-
-    
